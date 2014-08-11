@@ -32,7 +32,7 @@ class Predictor:
         # data_whole contains whole sentences arranged by category.
         # data_prop contains properties arranged by age group.
         # data_prop contains possible consequences of the properties above.
-        self.data_whole = [[], [], []] # [Money, Love, Politics]
+        self.data_whole = [[], [], [], []] # [Money, Love, Politics, Knowledge]
         self.data_prop = [[], [], []] # [Infant, Young, Grown-up]
         self.data_conseq = [[], [], []] # [Infant, Young, Grown-up]
         self.readData()
@@ -133,46 +133,34 @@ def gui():
             try:
                 date = datetime.datetime.strptime(self.entry.get(),
                      "%Y-%m-%d").date()
-                self.predView.updateDate(date)
+                self.predView.update(date)
             except ValueError:
                 pass
     class PredictionWidget(Frame):
         """Shows a prediction to the user."""
         def __init__(self, master):
             Frame.__init__(self, master)
-            #self.box = Listbox(self)
             self.text = Label(self, justify=CENTER, font="Arial 14", background="grey")
             self.predictor = Predictor()
-            self.predictions = []
             self.categories = []
             self.bind("<Configure>", self.onResize)
             self.activeCategory = IntVar()
-            #Style().configure("TFrame", background="black")
+            self.date = None
             for i in ("money.gif", "love.gif", "politics.gif", "knowledge.gif", "age.gif"):
                 imageData = PhotoImage(file=i)
                 category = Radiobutton(self, image=imageData,
                      variable=self.activeCategory, value=len(self.categories),
                      indicatoron=False, width=64, height=64,
-                     command=self.updateCategory)
+                     command=self.update)
                 category.imageData = imageData
                 self.categories.append(category)
         def placeCenterOf(self, widget, pos):
             widget.place(anchor="center", x=pos[0],y=pos[1])
-        def updateCategory(self):
-            """Update the Text which shows the current prediction."""
-            try:
-                prediction = self.predictions[self.activeCategory.get()]
-            except IndexError:
-                prediction = ""
-            prediction = textwrap.fill(prediction, width=20)
-            self.text.configure(text=prediction)
         def onResize(self, event):
             """Rearrange the children when geometry of self changes."""
             if event.widget == self:
-                print("Event:", event.width, event.height)
                 center = (event.width / 2, event.height / 2)
-                radius = min(center) - 32
-                #self.box.place(anchor=CENTER, x=center[0], y=center[1])
+                radius = min(center) - 32 # todo meaningless literal
                 self.text.place(anchor=CENTER, x=center[0], y=center[1])
                 for i, j in enumerate(self.categories):
                     turn = 2 * math.pi
@@ -180,15 +168,18 @@ def gui():
                     j.place(anchor=CENTER,
                             x=center[0] + math.cos(angle) * radius,
                             y=center[1] - math.sin(angle) * radius)
-        def updateDate(self, date):
-            """Set the prediction based on the user's input. todo ++ descr"""
-            self.predictions = self.predictor.predict(date)
-            self.updateCategory()
-            """
-            self.box.delete(0, END)
-            for i in self.predictor.predict(date):
-                self.box.insert(END, i)
-            """
+        def update(self, date=None):
+            """Change contents based on circumstances. Set date if not None."""
+            if date:
+                self.date = date
+            if self.date:
+                predictions = self.predictor.predict(self.date)
+                prediction = predictions[self.activeCategory.get()]
+                prediction = textwrap.fill(prediction, width=20)
+            else:
+                prediction = ""
+            self.text.configure(text=prediction)
+            
     class MainWindow(Tk):
         """Represents the window with core functionality."""
         def __init__(self, *args, **kwargs):
