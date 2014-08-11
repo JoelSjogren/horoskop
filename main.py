@@ -212,8 +212,11 @@ def gui():
     mainWindow.mainloop()
 def hasDisplay():
     """Determines whether the gui will work."""
-    # todo: fix for windows
-    return "DISPLAY" in os.environ
+    try:
+        tkinter.Tk().destroy()
+    except:
+        return False
+    return True
 if hasDisplay():
     gui()
 else:
