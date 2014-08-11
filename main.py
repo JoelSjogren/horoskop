@@ -21,6 +21,8 @@ import sys
 import time
 import tkinter, tkinter.ttk
 import traceback
+import os
+import math
 
 class Predictor:
     """Creates predictions based on dates."""
@@ -105,8 +107,9 @@ def cli():
     tellPrediction(pred)
     input("Tryck ENTER för att avsluta.")
 def gui():
-    from tkinter import Listbox, END, X, Tk, messagebox
-    from tkinter.ttk import Label, Entry, Button, Frame
+    from tkinter import Listbox, END, BOTH, X, Tk, messagebox, PhotoImage, \
+         IntVar, Radiobutton, CENTER, DISABLED, Text, WORD, FLAT, NORMAL
+    from tkinter.ttk import Label, Entry, Button, Frame, Style
     """Interact with the user graphically."""
     class DateWidget(Frame):
         """Gets a date from the user."""
@@ -134,25 +137,65 @@ def gui():
         """Shows a prediction to the user."""
         def __init__(self, master):
             Frame.__init__(self, master)
-            self.box = Listbox(master)
-            self.box.pack(fill=X)
+            #self.box = Listbox(self)
+            self.text = Label(self, justify=CENTER)
             self.predictor = Predictor()
+            self.predictions = []
+            self.categories = []
+            self.bind("<Configure>", self.onResize)
+            self.activeCategory = IntVar()
+            #Style().configure("TFrame", background="black")
+            for i in ("money.gif", "love.gif", "politics.gif", "knowledge.gif", "age.gif"):
+                imageData = PhotoImage(file=i)
+                category = Radiobutton(self, image=imageData,
+                     variable=self.activeCategory, value=len(self.categories),
+                     indicatoron=False, width=64, height=64,
+                     command=self.onCategoryChange)
+                category.imageData = imageData
+                self.categories.append(category)
+        def placeCenterOf(self, widget, pos):
+            widget.place(anchor="center", x=pos[0],y=pos[1])
+        def onCategoryChange(self):
+            """Update the Text which shows the current prediction."""
+            prediction = self.predictions[self.activeCategory.get()]
+            #self.text.delete("0", END)
+            #self.text.insert(END, prediction)
+            import textwrap
+            prediction = textwrap.fill(prediction, width=20)
+            self.text.configure(text=prediction)
+        def onResize(self, event):
+            """Rearrange the children when geometry of self changes."""
+            if event.widget == self:
+                print("Event:", event.width, event.height)
+                center = (event.width / 2, event.height / 2)
+                radius = min(center) - 32
+                #self.box.place(anchor=CENTER, x=center[0], y=center[1])
+                self.text.place(anchor=CENTER, x=center[0], y=center[1])
+                for i, j in enumerate(self.categories):
+                    turn = 2 * math.pi
+                    angle = turn * (1 / 4 - i / len(self.categories))
+                    j.place(anchor=CENTER,
+                            x=center[0] + math.cos(angle) * radius,
+                            y=center[1] - math.sin(angle) * radius)
         def refresh(self, date):
             """Set the prediction based on the user's input."""
+            self.predictions = self.predictor.predict(date)
+            """
             self.box.delete(0, END)
             for i in self.predictor.predict(date):
                 self.box.insert(END, i)
+            """
     class MainWindow(Tk):
         """Represents the window with core functionality."""
         def __init__(self, *args, **kwargs):
             """Make boxes, register callbacks etc."""
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
-            self.geometry("500x320")
+            self.geometry("500x500")
             date = DateWidget(self)
             date.pack(pady=10)
             pred = PredictionWidget(self)
-            pred.pack()
+            pred.pack(fill=BOTH, expand=True, padx=20, pady=20)
             date.setListener(pred)
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
@@ -163,11 +206,14 @@ def gui():
             sys.exit(1)
     mainWindow = MainWindow()
     mainWindow.mainloop()
-try:
+def hasDisplay():
+    """Determines whether the gui will work."""
+    # todo: fix for windows
+    return "DISPLAY" in os.environ
+if hasDisplay():
     gui()
-except tkinter.TclError:
+else:
     cli()
-
 
 
 
