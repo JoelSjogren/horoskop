@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmeringsteknik webbkurs KTH kodskelett.
 # Joel Sjögren
-# 2014-08-08
+# 2014-08-11
 """
 Tells the user what his life will be like.
 
@@ -126,6 +126,7 @@ def gui():
             self.button.pack()
             self.entry.focus_set()
             self.entry.select_range(0, END)
+            self.entry.bind("<Return>", lambda x: self.onDateChanged())
         def setListener(self, predView):
             self.predView = predView
         def onDateChanged(self):
@@ -146,14 +147,21 @@ def gui():
             self.bind("<Configure>", self.onResize)
             self.activeCategory = IntVar()
             self.date = None
-            for i in ("money.gif", "love.gif", "politics.gif", "knowledge.gif", "age.gif"):
-                imageData = PhotoImage(file=i)
-                category = Radiobutton(self, image=imageData,
+            for i in self.getIcons(): #("money.gif", "love.gif", "politics.gif", "knowledge.gif", "age.gif"):
+                category = Radiobutton(self, image=i,
                      variable=self.activeCategory, value=len(self.categories),
                      indicatoron=False, width=64, height=64,
                      command=self.update)
-                category.imageData = imageData
+                category.imageData = i
                 self.categories.append(category)
+        def getIcons(self):
+            print("!! getIcons")
+            result = []
+            representations = open("icons.txt").read().split("\n\n")
+            for i in representations:
+                image = PhotoImage(data=i)
+                result.append(image)
+            return result
         def placeCenterOf(self, widget, pos):
             widget.place(anchor="center", x=pos[0],y=pos[1])
         def onResize(self, event):
