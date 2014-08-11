@@ -41,8 +41,8 @@ class Predictor:
         def readIntoLists(lists, filename):
             """Read lines into lists, moving to the next list on empty line."""
             category = 0
-            with open(filename) as whole:
-                for i in whole.read().splitlines():
+            with open(filename, "rb") as whole:
+                for i in whole.read().decode("utf-8").splitlines():
                     if i == "":
                         category += 1
                     else:
@@ -147,7 +147,7 @@ def gui():
             self.bind("<Configure>", self.onResize)
             self.activeCategory = IntVar()
             self.date = None
-            for i in self.getIcons(): #("money.gif", "love.gif", "politics.gif", "knowledge.gif", "age.gif"):
+            for i in self.getIcons():
                 category = Radiobutton(self, image=i,
                      variable=self.activeCategory, value=len(self.categories),
                      indicatoron=False, width=64, height=64,
@@ -218,8 +218,6 @@ if hasDisplay():
     gui()
 else:
     cli()
-
-
 
 
 
