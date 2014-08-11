@@ -23,6 +23,7 @@ import tkinter, tkinter.ttk
 import traceback
 import os
 import math
+import textwrap
 
 class Predictor:
     """Creates predictions based on dates."""
@@ -123,6 +124,8 @@ def gui():
             self.button = Button(self, text="Uppdatera",
                  command=lambda: self.onDateChanged())
             self.button.pack()
+            self.entry.focus_set()
+            self.entry.select_range(0, END)
         def setListener(self, predView):
             self.predView = predView
         def onDateChanged(self):
@@ -130,7 +133,7 @@ def gui():
             try:
                 date = datetime.datetime.strptime(self.entry.get(),
                      "%Y-%m-%d").date()
-                self.predView.refresh(date)
+                self.predView.updateDate(date)
             except ValueError:
                 pass
     class PredictionWidget(Frame):
@@ -138,7 +141,7 @@ def gui():
         def __init__(self, master):
             Frame.__init__(self, master)
             #self.box = Listbox(self)
-            self.text = Label(self, justify=CENTER)
+            self.text = Label(self, justify=CENTER, font="Arial 14", background="grey")
             self.predictor = Predictor()
             self.predictions = []
             self.categories = []
@@ -150,17 +153,17 @@ def gui():
                 category = Radiobutton(self, image=imageData,
                      variable=self.activeCategory, value=len(self.categories),
                      indicatoron=False, width=64, height=64,
-                     command=self.onCategoryChange)
+                     command=self.updateCategory)
                 category.imageData = imageData
                 self.categories.append(category)
         def placeCenterOf(self, widget, pos):
             widget.place(anchor="center", x=pos[0],y=pos[1])
-        def onCategoryChange(self):
+        def updateCategory(self):
             """Update the Text which shows the current prediction."""
-            prediction = self.predictions[self.activeCategory.get()]
-            #self.text.delete("0", END)
-            #self.text.insert(END, prediction)
-            import textwrap
+            try:
+                prediction = self.predictions[self.activeCategory.get()]
+            except IndexError:
+                prediction = ""
             prediction = textwrap.fill(prediction, width=20)
             self.text.configure(text=prediction)
         def onResize(self, event):
@@ -177,9 +180,10 @@ def gui():
                     j.place(anchor=CENTER,
                             x=center[0] + math.cos(angle) * radius,
                             y=center[1] - math.sin(angle) * radius)
-        def refresh(self, date):
-            """Set the prediction based on the user's input."""
+        def updateDate(self, date):
+            """Set the prediction based on the user's input. todo ++ descr"""
             self.predictions = self.predictor.predict(date)
+            self.updateCategory()
             """
             self.box.delete(0, END)
             for i in self.predictor.predict(date):
@@ -192,6 +196,7 @@ def gui():
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
             self.geometry("500x500")
+            self.resizable(False, False)
             date = DateWidget(self)
             date.pack(pady=10)
             pred = PredictionWidget(self)
