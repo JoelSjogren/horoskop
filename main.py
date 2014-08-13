@@ -16,15 +16,15 @@ Here goes a general note about my naming convention. Variables look like_this, f
     >>> materialc = 3
 """
 
-import datetime
-import sys
-import time
-import tkinter, tkinter.ttk
-import traceback
-import os
-import math
-import textwrap
+import datetime     # date, datetime.strptime (parses date)
+import math         # cos, pi, sin
+import sys          # exit, stdout.flush
+import textwrap     # fill (wraps text)
+import time         # sleep
+import tkinter      # some widgets and data classes and constants
+import tkinter.ttk  # some widgets
 
+# Classes ===========================================================
 class Predictor:
     """Creates predictions based on dates."""
     def __init__(self):
@@ -78,6 +78,7 @@ class Predictor:
             result.append(i[index % len(i)])
         result.append(self.composePrediction(date))
         return result
+# Functions =========================================================
 def cli():
     """Interact with the user on the command line."""
     def tell(*args, delay=0.03, pause=True):
@@ -217,10 +218,21 @@ def hasDisplay():
     except:
         return False
     return True
+# Main ==============================================================
 if hasDisplay():
     gui()
 else:
     cli()
+"""
+Todo before submitting prototype:
+ - Add comments.
+Todo after submitting prototype::
+ - Make categories dynamic. Not just five should be allowed.
+    + Revise the structure of Predictor.data_whole.
+    + Revise the structure of data_whole.txt.
+ - Always hide either user input or output?
+ - Tell the user if the date entered is malformed.
+"""
 
 
 
