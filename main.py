@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmeringsteknik webbkurs KTH kodskelett.
 # Joel Sjögren
-# 2014-08-11
+# 2014-08-13
 """
 Tells the user what his life will be like.
 
@@ -33,8 +33,8 @@ class Predictor:
         # data_prop contains properties arranged by age group.
         # data_prop contains possible consequences of the properties above.
         self.data_whole = [[], [], [], []] # [Money, Love, Politics, Knowledge]
-        self.data_prop = [[], [], []] # [Infant, Young, Grown-up]
-        self.data_conseq = [[], [], []] # [Infant, Young, Grown-up]
+        self.data_prop = [[], [], []]      # [Infant, Young, Grown-up]
+        self.data_conseq = [[], [], []]    # [Infant, Young, Grown-up]
         self.readData()
     def readData(self):
         """Fill the data attributes by reading from files."""
@@ -47,8 +47,8 @@ class Predictor:
                         category += 1
                     else:
                         lists[category].append(i)
-        readIntoLists(self.data_whole, "pred-whole.txt")
-        readIntoLists(self.data_prop, "pred-prop.txt")
+        readIntoLists(self.data_whole,  "pred-whole.txt")
+        readIntoLists(self.data_prop,   "pred-prop.txt")
         readIntoLists(self.data_conseq, "pred-conseq.txt")
     def ageGroup(self, date):
         """Determine the age group of a person born on the date: 0, 1 or 2."""
@@ -81,6 +81,7 @@ class Predictor:
 # Functions =========================================================
 def cli():
     """Interact with the user on the command line."""
+    # Functions =====================================================
     def tell(*args, delay=0.03, pause=True):
         """Print one letter at a time and pause at the end by default."""
         msg = " ".join(str(i) for i in args)
@@ -103,16 +104,18 @@ def cli():
         for i in pred:
             tell(" - ", delay=0, pause=False)
             tell(i)
+    # Main ==========================================================
     tell("...\n", delay=0.4, pause=False)
     date = askDate("När är du född?")
     pred = Predictor().predict(date)
     tellPrediction(pred)
     input("Tryck ENTER för att avsluta.")
 def gui():
-    from tkinter import Listbox, END, BOTH, X, Tk, messagebox, PhotoImage, \
-         IntVar, Radiobutton, CENTER, DISABLED, Text, WORD, FLAT, NORMAL
-    from tkinter.ttk import Label, Entry, Button, Frame, Style
     """Interact with the user graphically."""
+    from tkinter import BOTH, CENTER, DISABLED, END, FLAT, IntVar, Listbox, \
+         messagebox, NORMAL, PhotoImage, Radiobutton, Text, Tk, WORD, X
+    from tkinter.ttk import Label, Entry, Button, Frame, Style
+    # Classes =======================================================
     class DateWidget(Frame):
         """Gets a date from the user."""
         def __init__(self, master):
@@ -156,7 +159,6 @@ def gui():
                 category.imageData = i
                 self.categories.append(category)
         def getIcons(self):
-            print("!! getIcons")
             result = []
             representations = open("icons.txt").read().split("\n\n")
             for i in representations:
@@ -178,17 +180,16 @@ def gui():
                             x=center[0] + math.cos(angle) * radius,
                             y=center[1] - math.sin(angle) * radius)
         def update(self, date=None):
-            """Change contents based on circumstances. Set date if not None."""
+            """Change contents based on circumstances. Set date if given."""
             if date:
                 self.date = date
             if self.date:
                 predictions = self.predictor.predict(self.date)
                 prediction = predictions[self.activeCategory.get()]
-                prediction = textwrap.fill(prediction, width=20)
+                prediction = textwrap.fill(prediction, width=20) # todo lit dup
             else:
                 prediction = ""
             self.text.configure(text=prediction)
-            
     class MainWindow(Tk):
         """Represents the window with core functionality."""
         def __init__(self, *args, **kwargs):
@@ -206,9 +207,10 @@ def gui():
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
             messagebox.showerror("Ett fel har uppstått", "För mer information,"
-                + " kör programmet från en terminal eller kommandotolk."
-                + " Programmet kommer nu att avslutas.")
+                 + " kör programmet från en terminal eller kommandotolk."
+                 + " Programmet kommer nu att avslutas.")
             sys.exit(1)
+    # Main ==========================================================
     mainWindow = MainWindow()
     mainWindow.mainloop()
 def hasDisplay():
