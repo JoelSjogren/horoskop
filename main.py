@@ -11,6 +11,8 @@ To make a prediction, the user's birthdate will do. We don't need a User class t
 
 I plan on having two user interfaces: a gui by default and a cli as fallback. Because they will contain the main loop, they will have big enough scope without having to be objects, so I made them functions.
 
+The gui icons are gif images stored as base64 text in icons.txt.
+
 Here goes a general note about my naming convention. Variables look like_this, functions likeThis and classes LikeThis. Constants don't get any special treatment. Moreover, if a variable ends with an s denoting plural (chairs) the variable is a list. If it ends with a c (chairc) it holds the count of something. For example,
     >>> materials = ["straw", "wood", "bricks"]
     >>> materialc = 3
@@ -132,6 +134,7 @@ def gui():
             self.entry.select_range(0, END)
             self.entry.bind("<Return>", lambda x: self.onDateChanged())
         def setListener(self, predView):
+            """Select whom to notify when a new date is entered."""
             self.predView = predView
         def onDateChanged(self):
             """Notifies the PredictionWidget that the date has been changed."""
@@ -145,28 +148,27 @@ def gui():
         """Shows a prediction to the user."""
         def __init__(self, master):
             Frame.__init__(self, master)
-            self.text = Label(self, justify=CENTER, font="Arial 14", background="grey")
+            self.text = Label(self, justify=CENTER, font="Arial 14", background="grey") # todo change background?
             self.predictor = Predictor()
             self.categories = []
             self.bind("<Configure>", self.onResize)
             self.activeCategory = IntVar()
             self.date = None
-            for i in self.getIcons():
+            for i in self.readIcons():
                 category = Radiobutton(self, image=i,
                      variable=self.activeCategory, value=len(self.categories),
                      indicatoron=False, width=64, height=64,
                      command=self.update)
                 category.imageData = i
                 self.categories.append(category)
-        def getIcons(self):
+        def readIcons(self):
+            """Read the gui icons from disk."""
             result = []
             representations = open("icons.txt").read().split("\n\n")
             for i in representations:
                 image = PhotoImage(data=i)
                 result.append(image)
             return result
-        def placeCenterOf(self, widget, pos):
-            widget.place(anchor="center", x=pos[0],y=pos[1])
         def onResize(self, event):
             """Rearrange the children when geometry of self changes."""
             if event.widget == self:
@@ -226,14 +228,15 @@ if hasDisplay():
 else:
     cli()
 """
-Todo before submitting prototype:
- - Add comments.
-Todo after submitting prototype::
+Todo:
  - Make categories dynamic. Not just five should be allowed.
     + Revise the structure of Predictor.data_whole.
     + Revise the structure of data_whole.txt.
  - Always hide either user input or output?
  - Tell the user if the date entered is malformed.
+ - Add welcome message.
+ - Comment on the icon script.
+ - Add a default icon.
 """
 
 
