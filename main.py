@@ -52,9 +52,8 @@ class Predictor:
         readToCategories(self.data_whole,  "pred-whole.txt")
         readToCategories(self.data_prop,   "pred-prop.txt")
         readToCategories(self.data_conseq, "pred-conseq.txt")
-        assert self.data_prop.keys() == self.data_conseq.keys()
     def ageGroup(self, date):
-        """Determine the age group of a person born on the date: 0, 1 or 2."""
+        """Determine the age group of a person born on the date."""
         age = datetime.date.today() - date
         if age.days < 5000:
             return "= child ="
@@ -65,7 +64,7 @@ class Predictor:
         """Determine an index to be used as a kind of random seed."""
         return date.toordinal()
     def chooseFromWholePredictions(self, date):
-        """Like predict() but using only data_whole as a source."""
+        """Like self.predict but using only self.data_whole as a source."""
         result = collections.OrderedDict()
         index = self.index(date)
         for i, j in self.data_whole.items():
@@ -86,7 +85,7 @@ class Predictor:
         result["= age ="] = self.composePrediction(date)
         return result
     def categories(self):
-        """Return a list of names of known categories."""
+        """Make a list of names of known categories."""
         return list(self.data_whole) + ["= age ="]
 # Functions =========================================================
 def cli():
@@ -123,7 +122,8 @@ def cli():
 def gui():
     """Interact with the user graphically."""
     from tkinter import BOTH, CENTER, DISABLED, END, FLAT, Listbox, \
-         messagebox, NORMAL, PhotoImage, Radiobutton, StringVar, Text, Tk, WORD, X
+         messagebox, NORMAL, PhotoImage, Radiobutton, StringVar, Text, Tk, \
+         WORD, X
     from tkinter.ttk import Label, Entry, Button, Frame, Style
     # Constants =====================================================
     windowWidth = 500
@@ -137,6 +137,7 @@ def gui():
     class DateWidget(Frame):
         """Gets a date from the user."""
         def __init__(self, master):
+            """Make boxes, register callbacks etc."""
             Frame.__init__(self, master)
             self.label = Label(self, text="När är du född?")
             self.label.pack()
@@ -169,6 +170,7 @@ def gui():
     class PredictionWidget(Frame):
         """Shows a prediction to the user."""
         def __init__(self, master):
+            """Make boxes, register callbacks etc."""
             Frame.__init__(self, master)
             self.activeCategory = StringVar()
             self.bind("<Configure>", self.onResize)
@@ -177,6 +179,7 @@ def gui():
             self.categoryButtons = self.createCategoryButtons()
             self.text = Label(self, justify=CENTER, font="Arial 14")
         def createCategoryButtons(self):
+            """Create the buttons used to choose category. Return them."""
             result = []
             icons = self.readIcons()
             categories = self.predictor.categories()
@@ -193,17 +196,16 @@ def gui():
             self.activeCategory.set(categories[0])
             return result
         def readIcons(self):
-            """Read the gui icons from disk."""
+            """Read the gui icons from disk. Return them."""
             result = {}
             categories = open("icons.txt").read().split("\n\n")
             for i in categories:
                 categoryName, fileData = i.split("\n", maxsplit=1)
-                #assert categoryName[:2] == "= " and categoryName[-2:] == " ="
                 image = PhotoImage(data=fileData)
                 result[categoryName] = image
             return result
         def onResize(self, event):
-            """Rearrange the children when geometry of self changes."""
+            """Rearrange the children when the geometry of self changes."""
             if event.widget == self:
                 center = (event.width / 2, event.height / 2)
                 radius = min(center) - 32 # todo meaningless literal
