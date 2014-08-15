@@ -57,7 +57,7 @@ class Predictor:
     def ageGroup(self, date):
         """Determine the age group of a person born on the date: 0, 1 or 2."""
         age = datetime.date.today() - date
-        if age.days < 400:
+        if age.days < 400: # todo change
             return "= child ="
         if age.days < 10000:
             return "= young ="
