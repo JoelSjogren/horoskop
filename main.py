@@ -227,7 +227,7 @@ def gui():
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
             self.geometry("{}x{}".format(windowWidth, windowHeight))
-            self.resizable(False, False)
+            #self.resizable(False, False)
             date = DateWidget(self)
             date.pack(pady=mediumPad)
             pred = PredictionWidget(self)
@@ -242,6 +242,7 @@ def gui():
             sys.exit(1)
     # Main ==========================================================
     mainWindow = MainWindow()
+    messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
     mainWindow.mainloop()
 def hasDisplay():
     """Determines whether the gui will work."""
@@ -263,6 +264,7 @@ Todo:
  - Add more predictions.
  - Fix icon script path.
  - Standardize icon size.
+ - Fix cli?
 """
 
 
