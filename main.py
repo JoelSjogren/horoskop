@@ -236,6 +236,7 @@ def gui():
             self.wm_title("Horoskop")
             self.geometry("{}x{}".format(windowWidth, windowHeight))
             #self.resizable(False, False)
+            self.minsize(windowWidth, windowHeight)
             date = DateWidget(self)
             date.pack(pady=mediumPad)
             pred = PredictionWidget(self)
