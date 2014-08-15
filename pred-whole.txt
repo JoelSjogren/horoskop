@@ -12,3 +12,14 @@ Nu är rätt tid att ta ditt politiska engagemang till en ny nivå.
 
 = knowledge =
 Din intuition visar dig allt du behöver veta.
+
+= new-category =
+Du kommer att få ett ok betyg på den här uppgiften.
+Du kommer att få bra betyg på den här uppgiften.
+Du kommer att få mycket bra betyg på den här uppgiften.
+
+= new-category2 =
+???
+
+= new-category3 =
+!!!

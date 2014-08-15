@@ -9,9 +9,9 @@ Of course the prediction may not be correct, but at least the result is well def
 
 To make a prediction, the user's birthdate will do. We don't need a User class to contain that information. There's no need to overdo extensibility in a small application. Likewise, we don't need a Prediction class. However, I have decided that the algorithm used to make predictions should be exchangeable because there are several potential algorithms in the field of astrology. The question is whether the common interface for making predictions should be just a function or a class. I have chosen to make a class, namely Predictor, because that way resources (in this case, the three files) need to be opened only once instead of each time a prediction is made.
 
-I plan on having two user interfaces: a gui by default and a cli as fallback. Because they will contain the main loop, they will have big enough scope without having to be objects, so I made them functions.
+There are two user interfaces: a gui by default and a cli as fallback. Because they contain the main part of the program, they will have big enough scope without having to be objects, so I made them functions.
 
-The gui icons are gif images stored as base64 text in icons.txt.
+The gui icons are gif images stored as base64 text in icons.txt. To add new gif icons or replace existing ones, run ./generate_icons.py with the filenames as arguments.
 
 Here goes a general note about my naming convention. Variables look like_this, functions likeThis and classes LikeThis. Constants don't get any special treatment. Moreover, if a variable ends with an s denoting plural (chairs) the variable is a list. If it ends with a c (chairc) it holds the count of something. For example,
     >>> materials = ["straw", "wood", "bricks"]
@@ -258,15 +258,11 @@ else:
     cli()
 """
 Todo:
- - Make categories dynamic. Not just five should be allowed.
-    + Revise the structure of Predictor.data_whole.
-    + Revise the structure of data_whole.txt.
-    + Make the icon script dynamic.
  - Always hide either user input or output?
  - Tell the user if the date entered is malformed.
  - Add welcome message.
- - Comment on the icon script.
- - Add a default icon.
+ - Add more predictions.
+ - Fix icon script path.
 """
 
 

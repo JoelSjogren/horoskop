@@ -3,14 +3,14 @@
 # Joel Sjögren
 # 2014-08-11
 """
-Creates base64 representations of the icons used so that they may be distributed in a single text file icons.txt which looks like
-    = Filename1 =
+Creates base64 representations of the icons in the argument list so that they may be distributed in a single text file icons.txt which looks like
+    = name1 =
     ABCDEF0123456789...
 
-    = Filename2 =
+    = name2 =
     ABCDEF0123456789...
 
-    = Filename3 =
+    = name3 =
     ABCDEF0123456789...
 """
 
