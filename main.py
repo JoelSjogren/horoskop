@@ -141,7 +141,10 @@ def gui():
             Frame.__init__(self, master)
             self.label = Label(self, text="När är du född?")
             self.label.pack()
-            self.entry = Entry(self, width=dateEntryWidth)
+            self.entryText = StringVar()
+            self.entryText.trace("w", lambda *args: self.onEntryChanged())
+            self.entry = Entry(self, width=dateEntryWidth,
+                 textvariable=self.entryText)
             self.entry.insert(0, "ÅÅÅÅ-MM-DD")
             self.entry.pack(pady=smallPad)
             self.button = Button(self, text="Uppdatera",
@@ -160,7 +163,10 @@ def gui():
                      "%Y-%m-%d").date()
                 self.predView.update(date)
             except ValueError:
-                pass
+                self.entry.configure(foreground="red")
+        def onEntryChanged(self):
+            """Reset the text color."""
+            self.entry.configure(foreground="")
     class PredictionWidget(Frame):
         """Shows a prediction to the user."""
         def __init__(self, master):
@@ -259,8 +265,6 @@ else:
 """
 Todo:
  - Always hide either user input or output?
- - Tell the user if the date entered is malformed.
- - Add welcome message.
  - Add more predictions.
 """
 
