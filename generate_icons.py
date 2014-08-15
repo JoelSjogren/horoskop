@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-# Programmeringsteknik webbkurs KTH kodskelett.
+# Programmeringsteknik webbkurs KTH slutinlämning.
 # Joel Sjögren
-# 2014-08-11
+# 2014-08-15
 """
 Creates base64 representations of the icons in the command line argument list so that they may be distributed in a single text file icons.txt which looks like
     = name1 =

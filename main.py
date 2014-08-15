@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Programmeringsteknik webbkurs KTH kodskelett.
+# Programmeringsteknik webbkurs KTH slutinlämning.
 # Joel Sjögren
 # 2014-08-15
 """
@@ -45,10 +45,9 @@ class Predictor:
         def readToCategories(categories, filename):
             """Read named groups of lines into a dictionary."""
             with open(filename, "rb") as whole:
-                for group in whole.read().decode("utf-8").strip("\n").split("\n\n"):
+                groups = whole.read().decode("utf-8").strip("\n").split("\n\n")
+                for group in groups:
                     name, lines = (lambda x: (x[0], x[1:]))(group.split("\n"))
-                    assert name[:2] == "= " and name[-2:] == " ="
-                    #name = name[2:-2]
                     categories[name] = lines
         readToCategories(self.data_whole,  "pred-whole.txt")
         readToCategories(self.data_prop,   "pred-prop.txt")
@@ -57,7 +56,7 @@ class Predictor:
     def ageGroup(self, date):
         """Determine the age group of a person born on the date: 0, 1 or 2."""
         age = datetime.date.today() - date
-        if age.days < 400: # todo change
+        if age.days < 5000:
             return "= child ="
         if age.days < 10000:
             return "= young ="
