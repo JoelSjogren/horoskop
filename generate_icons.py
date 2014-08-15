@@ -3,18 +3,64 @@
 # Joel Sjögren
 # 2014-08-11
 """
-Creates base64 representations of the icons used so that they may be sent as text files. The result is stored in icons.txt
+Creates base64 representations of the icons used so that they may be distributed in a single text file icons.txt which looks like
+    = Filename1 =
+    ABCDEF0123456789...
+
+    = Filename2 =
+    ABCDEF0123456789...
+
+    = Filename3 =
+    ABCDEF0123456789...
 """
 
-import base64
+import base64      # encodebytes
+import collections # OrderedDict
+import os          # path.basename, path.exists, path.splitext
+import sys         # argv
 
-categories = ("money", "love", "politics", "knowledge", "age")
-outData = []
-for i in categories:
-    inFile = open("gifs/{}.gif".format(i), "rb")
+filename = "icons.txt"
+exSep = "\n\n" # Separates icons from icons.
+inSep = "\n"   # Separates icon names from file data.
+# Read old icons.
+oldData = collections.OrderedDict() # {categoryName: fileData}
+if os.path.exists(filename):
+    with open(filename, "r") as oldFile:
+        oldString = oldFile.read()
+        if oldString != "":
+            for i in oldString.split(exSep):
+                categoryName, representation = i.split(inSep, maxsplit=1)
+                oldData[categoryName] = representation
+print("Old icons:")
+for i in oldData:
+    print(" ", i)
+# Read new icons.
+newData = collections.OrderedDict()
+if len(sys.argv) == 1:
+    raise Exception("There are no input files!")
+for i in sys.argv[1:]:
+    inFile = open(i, "rb")
     inData = inFile.read()
-    representation = base64.encodebytes(inData).decode()
-    #print(type(representation))
-    outData.append(representation)
-outFile = open("icons.txt", "w")
-outFile.write("\n".join(outData))
+    if inData[:4] != bytes("GIF8", "utf-8"):
+        raise Exception("`{}' is not a GIF file.".format(i))
+    representation = base64.encodebytes(inData).decode().strip("\n")
+    categoryName = "= {} =".format(os.path.splitext(os.path.basename(i))[0])
+    newData[categoryName] = representation
+print("Updating with:")
+for i in newData:
+    print(" ", i)
+# Write to disk, replacing old icons with new ones.
+outData = collections.OrderedDict()
+outData.update(oldData)
+outData.update(newData)
+"""
+print("Outdata:")
+for i in outData:
+    print(" ", i)
+"""
+outString = exSep.join("{}{}{}".format(i, inSep, j) for i, j in outData.items())
+outFile = open(filename, "w")
+outFile.write(outString)
+print("Done!")
+
+

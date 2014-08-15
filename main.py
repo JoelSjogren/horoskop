@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmeringsteknik webbkurs KTH kodskelett.
 # Joel Sjögren
-# 2014-08-13
+# 2014-08-15
 """
 Tells the user what his life will be like.
 
@@ -18,6 +18,7 @@ Here goes a general note about my naming convention. Variables look like_this, f
     >>> materialc = 3
 """
 
+import collections  # OrderedDict
 import datetime     # date, datetime.strptime (parses date)
 import math         # cos, pi, sin
 import sys          # exit, stdout.flush
@@ -34,35 +35,44 @@ class Predictor:
         # data_whole contains whole sentences arranged by category.
         # data_prop contains properties arranged by age group.
         # data_prop contains possible consequences of the properties above.
-        self.data_whole = [[], [], [], []] # [Money, Love, Politics, Knowledge]
-        self.data_prop = [[], [], []]      # [Infant, Young, Grown-up]
-        self.data_conseq = [[], [], []]    # [Infant, Young, Grown-up]
+        # The data is structured as {categoryName: strings}.
+        self.data_whole = collections.OrderedDict()  # Categories: money, etc.
+        self.data_prop = collections.OrderedDict()   # Categories: child, etc.
+        self.data_conseq = collections.OrderedDict() # Categories: child, etc.
         self.readData()
+        print(self.data_whole, self.data_prop, self.data_conseq)
     def readData(self):
         """Fill the data attributes by reading from files."""
-        def readIntoLists(lists, filename):
-            """Read lines into lists, moving to the next list on empty line."""
-            category = 0
+        def readToCategories(categories, filename):
+            """Read named groups of lines into a dictionary."""
             with open(filename, "rb") as whole:
-                for i in whole.read().decode("utf-8").splitlines():
-                    if i == "":
-                        category += 1
-                    else:
-                        lists[category].append(i)
-        readIntoLists(self.data_whole,  "pred-whole.txt")
-        readIntoLists(self.data_prop,   "pred-prop.txt")
-        readIntoLists(self.data_conseq, "pred-conseq.txt")
+                for group in whole.read().decode("utf-8").strip("\n").split("\n\n"):
+                    name, lines = (lambda x: (x[0], x[1:]))(group.split("\n"))
+                    assert name[:2] == "= " and name[-2:] == " ="
+                    #name = name[2:-2]
+                    categories[name] = lines
+        readToCategories(self.data_whole,  "pred-whole.txt")
+        readToCategories(self.data_prop,   "pred-prop.txt")
+        readToCategories(self.data_conseq, "pred-conseq.txt")
+        assert self.data_prop.keys() == self.data_conseq.keys()
     def ageGroup(self, date):
         """Determine the age group of a person born on the date: 0, 1 or 2."""
         age = datetime.date.today() - date
         if age.days < 400:
-            return 0
+            return "= child ="
         if age.days < 10000:
-            return 1
-        return 2
+            return "= young ="
+        return "= senior ="
     def index(self, date):
         """Determine an index to be used as a kind of random seed."""
         return date.toordinal()
+    def chooseFromWholePredictions(self, date):
+        """Like predict() but using only data_whole as a source."""
+        result = collections.OrderedDict()
+        index = self.index(date)
+        for i, j in self.data_whole.items():
+            result[i] = j[index % len(j)]
+        return result
     def composePrediction(self, date):
         """Make a prediction by combining data_prop and data_conseq."""
         ageGroup = self.ageGroup(date)
@@ -73,13 +83,13 @@ class Predictor:
             propAndConseq[i] = chooseFrom[index % len(chooseFrom)]
         return "Din {} förorsakar {}.".format(*propAndConseq)
     def predict(self, date):
-        """Make a prediction."""
-        index = self.index(date)
-        result = []
-        for i in self.data_whole:
-            result.append(i[index % len(i)])
-        result.append(self.composePrediction(date))
+        """Make a full set of predictions {categoryName: prediction}."""
+        result = self.chooseFromWholePredictions(date)
+        result["= age ="] = self.composePrediction(date)
         return result
+    def categories(self):
+        """Return a list of names of known categories."""
+        return list(self.data_whole) + ["= age ="]
 # Functions =========================================================
 def cli():
     """Interact with the user on the command line."""
@@ -114,9 +124,17 @@ def cli():
     input("Tryck ENTER för att avsluta.")
 def gui():
     """Interact with the user graphically."""
-    from tkinter import BOTH, CENTER, DISABLED, END, FLAT, IntVar, Listbox, \
-         messagebox, NORMAL, PhotoImage, Radiobutton, Text, Tk, WORD, X
+    from tkinter import BOTH, CENTER, DISABLED, END, FLAT, Listbox, \
+         messagebox, NORMAL, PhotoImage, Radiobutton, StringVar, Text, Tk, WORD, X
     from tkinter.ttk import Label, Entry, Button, Frame, Style
+    # Constants =====================================================
+    windowWidth = 500
+    windowHeight = 500
+    dateEntryWidth = 12
+    predictionTextWidth = 20
+    smallPad = 5
+    mediumPad = 10
+    bigPad = 20
     # Classes =======================================================
     class DateWidget(Frame):
         """Gets a date from the user."""
@@ -124,9 +142,9 @@ def gui():
             Frame.__init__(self, master)
             self.label = Label(self, text="När är du född?")
             self.label.pack()
-            self.entry = Entry(self, width=12)
+            self.entry = Entry(self, width=dateEntryWidth)
             self.entry.insert(0, "ÅÅÅÅ-MM-DD")
-            self.entry.pack(pady=5)
+            self.entry.pack(pady=smallPad)
             self.button = Button(self, text="Uppdatera",
                  command=lambda: self.onDateChanged())
             self.button.pack()
@@ -148,26 +166,37 @@ def gui():
         """Shows a prediction to the user."""
         def __init__(self, master):
             Frame.__init__(self, master)
-            self.text = Label(self, justify=CENTER, font="Arial 14", background="grey") # todo change background?
-            self.predictor = Predictor()
-            self.categories = []
+            self.activeCategory = StringVar()
             self.bind("<Configure>", self.onResize)
-            self.activeCategory = IntVar()
             self.date = None
-            for i in self.readIcons():
-                category = Radiobutton(self, image=i,
-                     variable=self.activeCategory, value=len(self.categories),
-                     indicatoron=False, width=64, height=64,
-                     command=self.update)
-                category.imageData = i
-                self.categories.append(category)
+            self.predictor = Predictor()
+            self.categoryButtons = self.createCategoryButtons()
+            self.text = Label(self, justify=CENTER, font="Arial 14")
+        def createCategoryButtons(self):
+            result = []
+            icons = self.readIcons()
+            categories = self.predictor.categories()
+            for i in categories:
+                if i in icons:
+                    icon = icons[i]
+                else:
+                    icon = icons["= default ="]
+                categoryButton = Radiobutton(self, image=icon,
+                     variable=self.activeCategory, value=i, indicatoron=False,
+                     width=64, height=64, command=self.update) # todo rem lit
+                categoryButton.imageData = icon
+                result.append(categoryButton)
+            self.activeCategory.set(categories[0])
+            return result
         def readIcons(self):
             """Read the gui icons from disk."""
-            result = []
-            representations = open("icons.txt").read().split("\n\n")
-            for i in representations:
-                image = PhotoImage(data=i)
-                result.append(image)
+            result = {}
+            categories = open("icons.txt").read().split("\n\n")
+            for i in categories:
+                categoryName, fileData = i.split("\n", maxsplit=1)
+                #assert categoryName[:2] == "= " and categoryName[-2:] == " ="
+                image = PhotoImage(data=fileData)
+                result[categoryName] = image
             return result
         def onResize(self, event):
             """Rearrange the children when geometry of self changes."""
@@ -175,9 +204,9 @@ def gui():
                 center = (event.width / 2, event.height / 2)
                 radius = min(center) - 32 # todo meaningless literal
                 self.text.place(anchor=CENTER, x=center[0], y=center[1])
-                for i, j in enumerate(self.categories):
+                for i, j in enumerate(self.categoryButtons):
                     turn = 2 * math.pi
-                    angle = turn * (1 / 4 - i / len(self.categories))
+                    angle = turn * (1 / 4 - i / len(self.categoryButtons))
                     j.place(anchor=CENTER,
                             x=center[0] + math.cos(angle) * radius,
                             y=center[1] - math.sin(angle) * radius)
@@ -188,7 +217,7 @@ def gui():
             if self.date:
                 predictions = self.predictor.predict(self.date)
                 prediction = predictions[self.activeCategory.get()]
-                prediction = textwrap.fill(prediction, width=20) # todo lit dup
+                prediction = textwrap.fill(prediction, width=20)
             else:
                 prediction = ""
             self.text.configure(text=prediction)
@@ -198,12 +227,12 @@ def gui():
             """Make boxes, register callbacks etc."""
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
-            self.geometry("500x500")
+            self.geometry("{}x{}".format(windowWidth, windowHeight))
             self.resizable(False, False)
             date = DateWidget(self)
-            date.pack(pady=10)
+            date.pack(pady=mediumPad)
             pred = PredictionWidget(self)
-            pred.pack(fill=BOTH, expand=True, padx=20, pady=20)
+            pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             date.setListener(pred)
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
@@ -232,6 +261,7 @@ Todo:
  - Make categories dynamic. Not just five should be allowed.
     + Revise the structure of Predictor.data_whole.
     + Revise the structure of data_whole.txt.
+    + Make the icon script dynamic.
  - Always hide either user input or output?
  - Tell the user if the date entered is malformed.
  - Add welcome message.
