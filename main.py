@@ -11,7 +11,7 @@ To make a prediction, the user's birthdate will do. We don't need a User class t
 
 There are two user interfaces: a gui by default and a cli as fallback. Because they contain the main part of the program, they will have big enough scope without having to be objects, so I made them functions.
 
-The gui icons are gif images stored as base64 text in icons.txt. To add new gif icons or replace existing ones, run ./generate_icons.py with the filenames as arguments.
+The gui icons are gif images stored as base64 text in icons.txt. To add new gif icons or replace existing ones, run generate_icons.py with the filenames as arguments.
 
 Here goes a general note about my naming convention. Variables look like_this, functions likeThis and classes LikeThis. Constants don't get any special treatment. Moreover, if a variable ends with an s denoting plural (chairs) the variable is a list. If it ends with a c (chairc) it holds the count of something. For example,
     >>> materials = ["straw", "wood", "bricks"]
@@ -262,9 +262,6 @@ Todo:
  - Tell the user if the date entered is malformed.
  - Add welcome message.
  - Add more predictions.
- - Fix icon script path.
- - Standardize icon size.
- - Fix cli?
 """
 
 

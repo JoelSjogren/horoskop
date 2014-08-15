@@ -16,16 +16,16 @@ Creates base64 representations of the icons in the command line argument list so
 
 import base64      # encodebytes
 import collections # OrderedDict
-import os          # path.basename, path.exists, path.splitext
+import os          # path # basename, dirname, exists, join, splitext
 import sys         # argv
 
-filename = "icons.txt"
+iconsFilename = os.path.join(os.path.dirname(__file__), "icons.txt")
 exSep = "\n\n" # Separates icons from icons.
 inSep = "\n"   # Separates icon names from file data.
 # Read old icons.
 oldData = collections.OrderedDict() # {categoryName: fileData}
-if os.path.exists(filename):
-    with open(filename, "r") as oldFile:
+if os.path.exists(iconsFilename):
+    with open(iconsFilename, "r") as oldFile:
         oldString = oldFile.read()
         if oldString != "":
             for i in oldString.split(exSep):
@@ -54,7 +54,7 @@ outData = collections.OrderedDict()
 outData.update(oldData)
 outData.update(newData)
 outString = exSep.join(i + inSep + j for i, j in outData.items())
-outFile = open(filename, "w")
+outFile = open(iconsFilename, "w")
 outFile.write(outString)
 print("Klart!")
 
