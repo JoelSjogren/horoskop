@@ -45,7 +45,8 @@ class Predictor:
         def readToCategories(categories, filename):
             """Read named groups of lines into a dictionary."""
             with open(filename, "rb") as whole:
-                groups = whole.read().decode("utf-8").strip("\n").split("\n\n")
+                groups = whole.read().decode("utf-8").replace("\r\n", "\n").\
+                     replace("\r", "\n").strip("\n").split("\n\n")
                 for group in groups:
                     name, lines = (lambda x: (x[0], x[1:]))(group.split("\n"))
                     categories[name] = lines
