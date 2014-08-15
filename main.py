@@ -264,5 +264,3 @@ if hasDisplay():
     gui()
 else:
     cli()
-# todo:
-#  - fix the error on windows. first appeared when adding welcome message.
