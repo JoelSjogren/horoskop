@@ -112,7 +112,7 @@ def cli():
                 tell("Hursa? ", pause=False)
     def tellPrediction(pred):
         """Reveal the prediction to the user."""
-        for i in pred:
+        for i in pred.values():
             tell(" - ", delay=0, pause=False)
             tell(i)
     # Main ==========================================================
