@@ -262,11 +262,4 @@ if hasDisplay():
     gui()
 else:
     cli()
-"""
-Todo:
- - Always hide either user input or output?
- - Add more predictions.
-"""
-
-
 
