@@ -241,6 +241,7 @@ def gui():
             pred = PredictionWidget(self)
             pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             date.setListener(pred)
+            self.after(10, messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu."))
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
@@ -250,7 +251,6 @@ def gui():
             sys.exit(1)
     # Main ==========================================================
     mainWindow = MainWindow()
-    messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
     mainWindow.mainloop()
 def hasDisplay():
     """Determines whether the gui will work."""
@@ -264,4 +264,5 @@ if hasDisplay():
     gui()
 else:
     cli()
-
+# todo:
+#  - fix the error on windows. first appeared when adding welcome message.
