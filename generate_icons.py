@@ -3,7 +3,7 @@
 # Joel Sjögren
 # 2014-08-11
 """
-Creates base64 representations of the icons in the argument list so that they may be distributed in a single text file icons.txt which looks like
+Creates base64 representations of the icons in the command line argument list so that they may be distributed in a single text file icons.txt which looks like
     = name1 =
     ABCDEF0123456789...
 
@@ -31,36 +31,31 @@ if os.path.exists(filename):
             for i in oldString.split(exSep):
                 categoryName, representation = i.split(inSep, maxsplit=1)
                 oldData[categoryName] = representation
-print("Old icons:")
+print("Gamla ikoner:")
 for i in oldData:
     print(" ", i)
 # Read new icons.
 newData = collections.OrderedDict()
 if len(sys.argv) == 1:
-    raise Exception("There are no input files!")
+    raise Exception("Du gav inga filer som argument!")
 for i in sys.argv[1:]:
     inFile = open(i, "rb")
     inData = inFile.read()
     if inData[:4] != bytes("GIF8", "utf-8"):
-        raise Exception("`{}' is not a GIF file.".format(i))
+        raise Exception("`{}' är ingen gif-fil.".format(i))
     representation = base64.encodebytes(inData).decode().strip("\n")
     categoryName = "= {} =".format(os.path.splitext(os.path.basename(i))[0])
     newData[categoryName] = representation
-print("Updating with:")
+print("Uppdaterar:")
 for i in newData:
     print(" ", i)
 # Write to disk, replacing old icons with new ones.
 outData = collections.OrderedDict()
 outData.update(oldData)
 outData.update(newData)
-"""
-print("Outdata:")
-for i in outData:
-    print(" ", i)
-"""
-outString = exSep.join("{}{}{}".format(i, inSep, j) for i, j in outData.items())
+outString = exSep.join(i + inSep + j for i, j in outData.items())
 outFile = open(filename, "w")
 outFile.write(outString)
-print("Done!")
+print("Klart!")
 
 

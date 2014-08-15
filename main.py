@@ -40,7 +40,6 @@ class Predictor:
         self.data_prop = collections.OrderedDict()   # Categories: child, etc.
         self.data_conseq = collections.OrderedDict() # Categories: child, etc.
         self.readData()
-        print(self.data_whole, self.data_prop, self.data_conseq)
     def readData(self):
         """Fill the data attributes by reading from files."""
         def readToCategories(categories, filename):
@@ -263,6 +262,7 @@ Todo:
  - Add welcome message.
  - Add more predictions.
  - Fix icon script path.
+ - Standardize icon size.
 """
 
 
