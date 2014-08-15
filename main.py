@@ -241,7 +241,7 @@ def gui():
             pred = PredictionWidget(self)
             pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             date.setListener(pred)
-            self.after(10, messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu."))
+            self.after(10, lambda: messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu."))
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
