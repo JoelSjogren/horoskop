@@ -134,6 +134,7 @@ def gui():
     smallPad = 5
     mediumPad = 10
     bigPad = 20
+    iconSize = 64
     # Classes =======================================================
     class DateWidget(Frame):
         """Gets a date from the user."""
@@ -191,7 +192,7 @@ def gui():
                     icon = icons["= default ="]
                 categoryButton = Radiobutton(self, image=icon,
                      variable=self.activeCategory, value=i, indicatoron=False,
-                     width=64, height=64, command=self.update) # todo rem lit
+                     width=iconSize, height=iconSize, command=self.update)
                 categoryButton.imageData = icon
                 result.append(categoryButton)
             self.activeCategory.set(categories[0])
@@ -209,7 +210,7 @@ def gui():
             """Rearrange the children when the geometry of self changes."""
             if event.widget == self:
                 center = (event.width / 2, event.height / 2)
-                radius = min(center) - 32 # todo meaningless literal
+                radius = min(center) - iconSize / 2
                 self.text.place(anchor=CENTER, x=center[0], y=center[1])
                 for i, j in enumerate(self.categoryButtons):
                     turn = 2 * math.pi
