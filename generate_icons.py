@@ -19,9 +19,11 @@ import collections # OrderedDict
 import os          # path # basename, dirname, exists, join, splitext
 import sys         # argv
 
+# Constants =========================================================
 iconsFilename = os.path.join(os.path.dirname(__file__), "icons.txt")
 exSep = "\n\n" # Separates icons from icons.
 inSep = "\n"   # Separates icon names from file data.
+# Functions =========================================================
 def readOldData():
     """Read old icon data that has been created using this script."""
     oldData = collections.OrderedDict() # {categoryName: fileData}
@@ -63,6 +65,7 @@ def writeData(outData):
     outString = exSep.join(i + inSep + j for i, j in outData.items())
     outFile = open(iconsFilename, "w")
     outFile.write(outString)
+# Main ==============================================================
 oldData = readOldData()
 printDataCategories("Gamla ikoner:", oldData)
 newData = readNewData()
