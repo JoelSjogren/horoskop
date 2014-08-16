@@ -235,14 +235,16 @@ def gui():
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
             self.geometry("{}x{}".format(windowWidth, windowHeight))
-            #self.resizable(False, False)
             self.minsize(windowWidth, windowHeight)
-            date = DateWidget(self)
-            date.pack(pady=mediumPad)
-            pred = PredictionWidget(self)
-            pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
-            date.setListener(pred)
-            self.after(10, lambda: messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu."))
+            self.date = DateWidget(self)
+            self.date.pack(pady=mediumPad)
+            self.pred = PredictionWidget(self)
+            self.pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
+            self.date.setListener(self.pred)
+            self.after(10, self.tellWelcome) # todo prettier if .update()?
+        def tellWelcome(self):
+            messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
+            self.date.entry.focus_set() # The box screws up focus on Linux. Fix.
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
