@@ -122,9 +122,8 @@ def cli():
     input("Tryck ENTER för att avsluta.")
 def gui():
     """Interact with the user graphically."""
-    from tkinter import BOTH, CENTER, DISABLED, END, FLAT, Listbox, \
-         messagebox, NORMAL, PhotoImage, Radiobutton, StringVar, Text, Tk, \
-         WORD, X
+    from tkinter import BOTH, CENTER, END, \
+         messagebox, PhotoImage, Radiobutton, StringVar, Tk
     from tkinter.ttk import Label, Entry, Button, Frame, Style
     # Constants =====================================================
     windowWidth = 500
