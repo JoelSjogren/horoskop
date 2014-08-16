@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmeringsteknik webbkurs KTH slutinlämning.
 # Joel Sjögren
-# 2014-08-15
+# 2014-08-16
 """
 Tells the user what his life will be like.
 
