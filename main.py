@@ -229,7 +229,7 @@ def gui():
                 prediction = ""
             self.text.configure(text=prediction)
     class MainWindow(Tk):
-        """Represents the window with core functionality."""
+        """Represents the main window with core functionality."""
         def __init__(self, *args, **kwargs):
             """Make boxes, register callbacks etc."""
             Tk.__init__(self, *args, **kwargs)
@@ -241,8 +241,6 @@ def gui():
             self.pred = PredictionWidget(self)
             self.pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             self.date.setListener(self.pred)
-            self.update()
-            messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
@@ -252,6 +250,8 @@ def gui():
             sys.exit(1)
     # Main ==========================================================
     mainWindow = MainWindow()
+    mainWindow.update()
+    messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
     mainWindow.mainloop()
 def hasDisplay():
     """Determines whether the gui will work."""
