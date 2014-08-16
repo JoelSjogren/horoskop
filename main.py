@@ -242,10 +242,7 @@ def gui():
             self.pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             self.date.setListener(self.pred)
             self.update()
-            self.tellWelcome()
-        def tellWelcome(self):
             messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
-            self.date.entry.focus_set() # The box screws up focus on Linux. Fix.
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
