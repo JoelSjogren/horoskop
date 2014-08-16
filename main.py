@@ -241,7 +241,8 @@ def gui():
             self.pred = PredictionWidget(self)
             self.pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
             self.date.setListener(self.pred)
-            self.after(10, self.tellWelcome) # todo prettier if .update()?
+            self.update()
+            self.tellWelcome()
         def tellWelcome(self):
             messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
             self.date.entry.focus_set() # The box screws up focus on Linux. Fix.
