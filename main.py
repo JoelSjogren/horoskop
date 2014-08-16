@@ -73,15 +73,15 @@ class Predictor:
         return result
     def composePrediction(self, date):
         """Make a prediction by combining data_prop and data_conseq."""
-        ageGroup = self.ageGroup(date)
+        age_group = self.ageGroup(date)
         index = self.index(date)
-        propAndConseq = [None, None]
+        prop_and_conseq = [None, None]
         for i, j in ((0, self.data_prop), (1, self.data_conseq)):
-            chooseFrom = j[ageGroup]
-            propAndConseq[i] = chooseFrom[index % len(chooseFrom)]
-        return "Din {} förorsakar {}.".format(*propAndConseq)
+            choose_from = j[age_group]
+            prop_and_conseq[i] = choose_from[index % len(choose_from)]
+        return "Din {} förorsakar {}.".format(*prop_and_conseq)
     def predict(self, date):
-        """Make a full set of predictions {categoryName: prediction}."""
+        """Make a full set of predictions {category_name: prediction}."""
         result = self.chooseFromWholePredictions(date)
         result["= age ="] = self.composePrediction(date)
         return result
@@ -126,14 +126,14 @@ def gui():
          messagebox, PhotoImage, Radiobutton, StringVar, Tk
     from tkinter.ttk import Label, Entry, Button, Frame, Style
     # Constants =====================================================
-    windowWidth = 500
-    windowHeight = 500
-    dateEntryWidth = 12
-    predictionTextWidth = 20
-    smallPad = 5
-    mediumPad = 10
-    bigPad = 20
-    iconSize = 64
+    window_width = 500
+    window_height = 500
+    date_entry_width = 12
+    prediction_text_width = 20
+    small_pad = 5
+    medium_pad = 10
+    big_pad = 20
+    icon_size = 64
     # Classes =======================================================
     class DateWidget(Frame):
         """Gets a date from the user."""
@@ -142,27 +142,27 @@ def gui():
             Frame.__init__(self, master)
             self.label = Label(self, text="När är du född?")
             self.label.pack()
-            self.entryText = StringVar()
-            self.entryText.trace("w", lambda *args: self.onEntryChanged())
-            self.entry = Entry(self, width=dateEntryWidth,
-                 textvariable=self.entryText)
+            self.entry_text = StringVar()
+            self.entry_text.trace("w", lambda *args: self.onEntryChanged())
+            self.entry = Entry(self, width=date_entry_width,
+                 textvariable=self.entry_text)
             self.entry.insert(0, "ÅÅÅÅ-MM-DD")
-            self.entry.pack(pady=smallPad)
+            self.entry.pack(pady=small_pad)
             self.button = Button(self, text="Uppdatera",
                  command=lambda: self.onDateChanged())
             self.button.pack()
             self.entry.focus_set()
             self.entry.select_range(0, END)
             self.entry.bind("<Return>", lambda x: self.onDateChanged())
-        def setListener(self, predView):
+        def setListener(self, pred_view):
             """Select whom to notify when a new date is entered."""
-            self.predView = predView
+            self.pred_view = pred_view
         def onDateChanged(self):
             """Notifies the PredictionWidget that the date has been changed."""
             try:
                 date = datetime.datetime.strptime(self.entry.get(),
                      "%Y-%m-%d").date()
-                self.predView.update(date)
+                self.pred_view.update(date)
             except ValueError:
                 self.entry.configure(foreground="red")
         def onEntryChanged(self):
@@ -173,11 +173,11 @@ def gui():
         def __init__(self, master):
             """Make boxes, register callbacks etc."""
             Frame.__init__(self, master)
-            self.activeCategory = StringVar()
+            self.active_category = StringVar()
             self.bind("<Configure>", self.onResize)
             self.date = None
             self.predictor = Predictor()
-            self.categoryButtons = self.createCategoryButtons()
+            self.category_buttons = self.createCategoryButtons()
             self.text = Label(self, justify=CENTER, font="Arial 14")
         def createCategoryButtons(self):
             """Create the buttons used to choose category. Return them."""
@@ -189,31 +189,31 @@ def gui():
                     icon = icons[i]
                 else:
                     icon = icons["= default ="]
-                categoryButton = Radiobutton(self, image=icon,
-                     variable=self.activeCategory, value=i, indicatoron=False,
-                     width=iconSize, height=iconSize, command=self.update)
-                categoryButton.imageData = icon
-                result.append(categoryButton)
-            self.activeCategory.set(categories[0])
+                category_button = Radiobutton(self, image=icon,
+                     variable=self.active_category, value=i, indicatoron=False,
+                     width=icon_size, height=icon_size, command=self.update)
+                category_button.image_data = icon
+                result.append(category_button)
+            self.active_category.set(categories[0])
             return result
         def readIcons(self):
             """Read the gui icons from disk. Return them."""
             result = {}
             categories = open("icons.txt").read().split("\n\n")
             for i in categories:
-                categoryName, fileData = i.split("\n", maxsplit=1)
-                image = PhotoImage(data=fileData)
-                result[categoryName] = image
+                category_name, file_data = i.split("\n", maxsplit=1)
+                image = PhotoImage(data=file_data)
+                result[category_name] = image
             return result
         def onResize(self, event):
             """Rearrange the children when the geometry of self changes."""
             if event.widget == self:
                 center = (event.width / 2, event.height / 2)
-                radius = min(center) - iconSize / 2
+                radius = min(center) - icon_size / 2
                 self.text.place(anchor=CENTER, x=center[0], y=center[1])
-                for i, j in enumerate(self.categoryButtons):
+                for i, j in enumerate(self.category_buttons):
                     turn = 2 * math.pi
-                    angle = turn * (1 / 4 - i / len(self.categoryButtons))
+                    angle = turn * (1 / 4 - i / len(self.category_buttons))
                     j.place(anchor=CENTER,
                             x=center[0] + math.cos(angle) * radius,
                             y=center[1] - math.sin(angle) * radius)
@@ -223,7 +223,7 @@ def gui():
                 self.date = date
             if self.date:
                 predictions = self.predictor.predict(self.date)
-                prediction = predictions[self.activeCategory.get()]
+                prediction = predictions[self.active_category.get()]
                 prediction = textwrap.fill(prediction, width=20)
             else:
                 prediction = ""
@@ -234,12 +234,12 @@ def gui():
             """Make boxes, register callbacks etc."""
             Tk.__init__(self, *args, **kwargs)
             self.wm_title("Horoskop")
-            self.geometry("{}x{}".format(windowWidth, windowHeight))
-            self.minsize(windowWidth, windowHeight)
+            self.geometry("{}x{}".format(window_width, window_height))
+            self.minsize(window_width, window_height)
             self.date = DateWidget(self)
-            self.date.pack(pady=mediumPad)
+            self.date.pack(pady=medium_pad)
             self.pred = PredictionWidget(self)
-            self.pred.pack(fill=BOTH, expand=True, padx=bigPad, pady=bigPad)
+            self.pred.pack(fill=BOTH, expand=True, padx=big_pad, pady=big_pad)
             self.date.setListener(self.pred)
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
@@ -249,10 +249,10 @@ def gui():
                  + " Programmet kommer nu att avslutas.")
             sys.exit(1)
     # Main ==========================================================
-    mainWindow = MainWindow()
-    mainWindow.update()
+    main_window = MainWindow()
+    main_window.update()
     messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
-    mainWindow.mainloop()
+    main_window.mainloop()
 def hasDisplay():
     """Determines whether the gui will work."""
     try:
@@ -265,3 +265,5 @@ if hasDisplay():
     gui()
 else:
     cli()
+
+# todo conform to naming convention
