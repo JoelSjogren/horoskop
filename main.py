@@ -92,7 +92,8 @@ class Predictor:
 # Functions =========================================================
 def nextToThisFile(filename):
     """Join the directory in which this program resides with the filename."""
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), filename)
+    directory = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(directory, filename)
 def cli():
     """Interact with the user on the command line."""
     # Functions =====================================================
