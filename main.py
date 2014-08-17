@@ -21,6 +21,7 @@ Here goes a general note about my naming convention. Variables look like_this, f
 import collections  # OrderedDict
 import datetime     # date, datetime.strptime (parses date)
 import math         # cos, pi, sin
+import os           # path.dirname, path.join
 import sys          # exit, stdout.flush
 import textwrap     # fill (wraps text)
 import time         # sleep
@@ -50,9 +51,9 @@ class Predictor:
                 for group in groups:
                     name, lines = (lambda x: (x[0], x[1:]))(group.split("\n"))
                     categories[name] = lines
-        readToCategories(self.data_whole,  "pred-whole.txt")
-        readToCategories(self.data_prop,   "pred-prop.txt")
-        readToCategories(self.data_conseq, "pred-conseq.txt")
+        readToCategories(self.data_whole,  nextToThisFile("pred-whole.txt"))
+        readToCategories(self.data_prop,   nextToThisFile("pred-prop.txt"))
+        readToCategories(self.data_conseq, nextToThisFile("pred-conseq.txt"))
     def ageGroup(self, date):
         """Determine the age group of a person born on the date."""
         age = datetime.date.today() - date
@@ -89,6 +90,9 @@ class Predictor:
         """Make a list of names of known categories."""
         return list(self.data_whole) + ["= age ="]
 # Functions =========================================================
+def nextToThisFile(filename):
+    """Join the directory in which this program resides with the filename."""
+    return os.path.join(os.path.dirname(__file__), filename)
 def cli():
     """Interact with the user on the command line."""
     # Functions =====================================================
@@ -199,7 +203,7 @@ def gui():
         def readIcons(self):
             """Read the gui icons from disk. Return them."""
             result = {}
-            categories = open("icons.txt").read().split("\n\n")
+            categories = open(nextToThisFile("icons.txt")).read().split("\n\n")
             for i in categories:
                 category_name, file_data = i.split("\n", maxsplit=1)
                 image = PhotoImage(data=file_data)
@@ -265,5 +269,3 @@ if hasDisplay():
     gui()
 else:
     cli()
-
-# todo conform to naming convention
