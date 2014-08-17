@@ -27,6 +27,7 @@ import textwrap     # fill (wraps text)
 import time         # sleep
 import tkinter      # some widgets and data classes and constants
 import tkinter.ttk  # some widgets
+import traceback    # print_exc
 
 # Classes ===========================================================
 class Predictor:
@@ -249,15 +250,26 @@ def gui():
         def report_callback_exception(self, *args):
             """If exception raised, don't just fail silently. Overrides."""
             Tk.report_callback_exception(self, *args)
-            messagebox.showerror("Ett fel har uppstått", "För mer information,"
-                 + " kör programmet från en terminal eller kommandotolk."
-                 + " Programmet kommer nu att avslutas.")
-            sys.exit(1)
+            tellTerminate()
+    # Functions =====================================================
+    def tellTerminate():
+        """Tell the user that something went wrong, then exit."""
+        messagebox.showerror("Ett fel har uppstått", "För mer information,"
+             + " kör programmet från en terminal eller kommandotolk."
+             + " Programmet kommer nu att avslutas.")
+        sys.exit(1)
+    def tellWelcome():
+        """Welcome the user."""
+        messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
     # Main ==========================================================
-    main_window = MainWindow()
-    main_window.update()
-    messagebox.showinfo("Välkommen!", "Ditt öde bestäms nu.")
-    main_window.mainloop()
+    try:
+        main_window = MainWindow()
+        main_window.update()
+        tellWelcome()
+        main_window.mainloop()
+    except:
+        traceback.print_exc()
+        tellTerminate()
 def hasDisplay():
     """Determines whether the gui will work."""
     try:
