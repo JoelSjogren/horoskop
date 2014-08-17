@@ -21,7 +21,7 @@ Here goes a general note about my naming convention. Variables look like_this, f
 import collections  # OrderedDict
 import datetime     # date, datetime.strptime (parses date)
 import math         # cos, pi, sin
-import os           # path.dirname, path.join
+import os           # path.dirname, path.join, path.realpath
 import sys          # exit, stdout.flush
 import textwrap     # fill (wraps text)
 import time         # sleep
@@ -92,7 +92,7 @@ class Predictor:
 # Functions =========================================================
 def nextToThisFile(filename):
     """Join the directory in which this program resides with the filename."""
-    return os.path.join(os.path.dirname(__file__), filename)
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), filename)
 def cli():
     """Interact with the user on the command line."""
     # Functions =====================================================

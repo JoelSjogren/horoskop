@@ -16,11 +16,12 @@ Creates base64 representations of the icons in the command line argument list so
 
 import base64      # encodebytes
 import collections # OrderedDict
-import os          # path # basename, dirname, exists, join, splitext
+import os          # path # basename, dirname, exists, join, realpath, splitext
 import sys         # argv
 
 # Constants =========================================================
-icons_filename = os.path.join(os.path.dirname(__file__), "icons.txt")
+icons_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),\
+     "icons.txt")
 ex_sep = "\n\n" # Separates icons from icons.
 in_sep = "\n"   # Separates icon names from file data.
 # Functions =========================================================
